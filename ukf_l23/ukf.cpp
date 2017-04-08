@@ -54,8 +54,26 @@ void UKF::PredictMeanAndCovariance(VectorXd* x_out, MatrixXd* P_out) {
  ******************************************************************************/
 
   //set weights
+  weights(0)  = lambda / (lambda + n_aug);
+  /* Set w for each column i.e. each of the sigma points */
+  for (size_t i = 1; i < 2*n_aug+1; i++)
+  {
+    weights(i) = 1 / (2*(lambda + n_aug));
+  }
   //predict state mean
+  for (size_t i = 0; i < 2*n_aug+1; i++) {
+    x = x+ weights(i) * Xsig_pred.col(i);
+  }
   //predict state covariance matrix
+  for (size_t i = 0; i < 2*n_aug+1  ; i++) {
+      VectorXd x_diff = Xsig_pred.col(i) - x;
+      //angle normalization
+      // set the angle between +Pi and -Pi
+      while (x_diff(3)> M_PI) x_diff(3)-=2.*M_PI;
+      while (x_diff(3)<-M_PI) x_diff(3)+=2.*M_PI;
+
+      P +=  weights(i)*x_diff*x_diff.transpose();
+  }
 
 
 /*******************************************************************************
@@ -72,3 +90,24 @@ void UKF::PredictMeanAndCovariance(VectorXd* x_out, MatrixXd* P_out) {
   *x_out = x;
   *P_out = P;
 }
+
+
+/*
+Expected:
+x =
+5.93637
+1.49035
+2.20528
+0.536853
+0.353577
+
+P =
+
+ 0.00543425  -0.0024053   0.00341576  -0.00348196   -0.00299378
+-0.0024053    0.010845    0.0014923    0.00980182    0.00791091
+ 0.00341576   0.0014923   0.00580129   0.000778632   0.000792973
+-0.00348196   0.00980182  0.000778632  0.0119238     0.0112491
+-0.00299378   0.00791091  0.000792973  0.0112491     0.0126972
+
+
+*/
