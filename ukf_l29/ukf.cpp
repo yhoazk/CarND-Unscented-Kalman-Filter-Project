@@ -104,8 +104,17 @@ void UKF::UpdateState(VectorXd* x_out, MatrixXd* P_out) {
  ******************************************************************************/
 
   //calculate cross correlation matrix
+  for (size_t i = 0; i < 2*n_aug+1; i++) {
+    VectorXd x_diff = Xsig_pred.col(i) - x;
+    VectorXd z_diff = Zsig.col(i) - z_pred;
+    Tc += weights(i) * x_diff * z_diff.transpose();
+  }
   //calculate Kalman gain K;
+  MatrixXd Kg = Tc * S.inverse();
   //update state mean and covariance matrix
+  x = x + Kg*(z-z_pred);
+
+  P = P - Kg*S*Kg.transpose();
 
 
 /*******************************************************************************
@@ -122,4 +131,57 @@ void UKF::UpdateState(VectorXd* x_out, MatrixXd* P_out) {
 }
 
 
-/*  */
+/*
+expected result x:
+ x =
+5.92276
+1.41823
+2.15593
+0.489274
+0.321338
+
+expected result P:
+ P =
+0.00361579 -0.000357881 0.00208316 -0.000937196 -0.00071727
+-0.000357881 0.00539867 0.00156846 0.00455342 0.00358885
+0.00208316 0.00156846 0.00410651 0.00160333 0.00171811
+-0.000937196 0.00455342 0.00160333 0.00652634 0.00669436
+-0.00071719 0.00358884 0.00171811 0.00669426 0.00881797
+
+UDA response:
+
+//calculate cross correlation matrix
+Tc.fill(0.0);
+for (int i = 0; i < 2 * n_aug + 1; i++) {  //2n+1 simga points
+
+  //residual
+  VectorXd z_diff = Zsig.col(i) - z_pred;
+  //angle normalization
+  while (z_diff(1)> M_PI) z_diff(1)-=2.*M_PI;
+  while (z_diff(1)<-M_PI) z_diff(1)+=2.*M_PI;
+
+  // state difference
+  VectorXd x_diff = Xsig_pred.col(i) - x;
+  //angle normalization
+  while (x_diff(3)> M_PI) x_diff(3)-=2.*M_PI;
+  while (x_diff(3)<-M_PI) x_diff(3)+=2.*M_PI;
+
+  Tc = Tc + weights(i) * x_diff * z_diff.transpose();
+}
+
+//Kalman gain K;
+MatrixXd K = Tc * S.inverse();
+
+//residual
+VectorXd z_diff = z - z_pred;
+
+//angle normalization
+while (z_diff(1)> M_PI) z_diff(1)-=2.*M_PI;
+while (z_diff(1)<-M_PI) z_diff(1)+=2.*M_PI;
+
+//update state mean and covariance matrix
+x = x + K * z_diff;
+P = P - K*S*K.transpose();
+
+
+ */
