@@ -34,13 +34,13 @@ class UKF {
   MatrixXd P_aug_;
   ///*
   MatrixXd Xsig_aug_;
-  long dt;
+  double_t dt;
 
     MatrixXd S_radar; //MatrixXd(n_z,n_z);
   MatrixXd S_laser;
   ///* Dimension for radar
-  static int nradar_z;
-  static int nlaser_z;
+   int nradar_z;
+   int nlaser_z;
 
 public:
   ///* initially set to false, set to true in first call of ProcessMeasurement
