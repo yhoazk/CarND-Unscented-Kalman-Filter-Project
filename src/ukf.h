@@ -12,8 +12,37 @@ using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
 class UKF {
-public:
+  ///* Previous time stamp
+  long previous_timestamp_;
+  ///* Generate sigma points
+  bool GenerateSigmaPoints(void);
+  //bool AugmentedSigmaPoints(MatrixXd* Xsig_out);
+  bool AugmentedSigmaPoints(void);
+ // bool SigmaPointPrediction(MatrixXd* Xsig_out);
+  bool SigmaPointPrediction(void);
+ // bool PredictMeanAndCovariance(VectorXd* x_out, MatrixXd* P_out);
+  bool PredictMeanAndCovariance(void);
+ // bool PredictRadarMeasurement(VectorXd* z_out, MatrixXd* S_out);
+  bool PredictRadarMeasurement(void);
+ // bool UpdateState(VectorXd* x_out, MatrixXd* P_out);
+  bool UpdateState(void);
+ // VectorXd polar2cart(VectorXd* pol_coord);
 
+  ///* Augmented state
+  VectorXd x_aug_;
+  ///* Augmentes covariance matrix
+  MatrixXd P_aug_;
+  ///*
+  MatrixXd Xsig_aug_;
+  long dt;
+
+    MatrixXd S_radar; //MatrixXd(n_z,n_z);
+  MatrixXd S_laser;
+  ///* Dimension for radar
+  static int nradar_z;
+  static int nlaser_z;
+
+public:
   ///* initially set to false, set to true in first call of ProcessMeasurement
   bool is_initialized_;
 
@@ -68,7 +97,10 @@ public:
   ///* Sigma point spreading parameter
   double lambda_;
 
-  ///* the current NIS for radar
+  ///* the current NIS for radar  NIS: Normalized Innovation Squared
+  /**
+   * e = (measurement - predicted).transpose() * S.inverse() * (measurement - predicted)
+   */
   double NIS_radar_;
 
   ///* the current NIS for laser

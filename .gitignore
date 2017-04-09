@@ -4,3 +4,5 @@
 # build files
 build/
 *.exe
+.idea/
+cmake-build-debug/
