@@ -72,12 +72,22 @@ UKF::UKF(double std_radr, double std_radphi, double std_radrd) {
 
 inline double wrapAngle( double angle )
 {
-  if(fabs(angle) <= 0.001f)
+ /* if(fabs(angle) <= 0.001f)
   {
     return 0.001;//angle;
   }
   double twoPi = 2.0 * 3.141592865358979;
-  return angle - twoPi * floor( angle / twoPi );
+  return angle - twoPi * floor( angle / twoPi );*/
+  angle = fmodf(angle, 2.0*M_PI /*360.0f*/);
+  if (angle > M_PI /*180*/)
+  {
+    angle -=2.0*M_PI /*360*/;
+  }
+  if (angle < -M_PI/* -180*/)
+  {
+    angle +=2.0*M_PI/* 360*/;
+  }
+  return angle;
 }
 
 UKF::~UKF() {}
@@ -345,7 +355,14 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
   {
     std::cout << "XX";
   }
-  UKF::Prediction(dt);
+
+  while (dt > 0.1)
+  {
+    cout << "xxxxxxxxxxxxx" << endl;
+    Prediction(0.1); // Kalman Filter prediction step
+    dt -= 0.1;
+  }
+  Prediction(dt);
   if(meas_package.sensor_type_ == MeasurementPackage::LASER)
   {
     if(use_laser_)
@@ -472,16 +489,21 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
     double phi;
     double rho_dot;
     rho = sqrt(state[0] *state[0] + state[1]*state[1] );
-    phi = atan2(state[1] , state[0]);
+    if(fabs(state(0)) > 0.00001f) {
+      phi = atan2(state[1], state[0]);
+    }else {
+      phi = M_PI_2;
+    }
+
     rho_dot = (state[0] * (cos(state[3])*state[2]) +  state[1] * sin(state[3]) * state[2]);
-    if(fabs(rho) >= 0.001f)
+    if(state(0) >= 0.001f)
     {
-      rho_dot /= rho;
+      rho_dot = rho_dot / rho;
     }
     else
     {
  //     std::cout << ".";
-      rho_dot /= 0.001f;
+      rho_dot = 0.0001f;
     }
     Zsig(0,j) = rho;
     Zsig(1,j) = phi;
@@ -497,8 +519,8 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
     //VectorXd x_diff = Xsig_pred_.col(i) - x_;
     VectorXd z_diff = Zsig.col(i) - z_pred;
     z_diff(1) = wrapAngle(z_diff(1));
-   // while (z_diff(1)> M_PI) z_diff(1)-=2.*M_PI;
-    // while (z_diff(1)<-M_PI) z_diff(1)+=2.*M_PI;
+    //while (z_diff(1)> M_PI) z_diff(1)-=2.*M_PI;
+    //while (z_diff(1)<-M_PI) z_diff(1)+=2.*M_PI;
 
     S_radar += weights_(i) * z_diff * z_diff.transpose();
   }

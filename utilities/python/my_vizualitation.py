@@ -23,5 +23,18 @@ for line in lines:
 
 
 plt.scatter(values['px'], values['py'])
-plt.scatter(values['px_true'], values['py_true'], color='red')
+plt.scatter(values['px_measured'], values['py_measured'], color='red')
 plt.show()
+
+
+
+'''
+import plotly.offline as py
+from plotly.graph_objs import *
+import pandas as pd
+import math
+
+my_cols=['px_est','py_est','vx_est','vy_est','px_meas','py_meas','px_gt','py_gt','vx_gt','vy_gt']
+with open('/home/porko/workspace/nd_autocar/CarND-Unscented-Kalman-Filter-Project/build/log.log') as f:
+    table_ekf_output = pd.read_table(f, sep='\t', header=None, names=my_cols, lineterminator='\n')
+'''
