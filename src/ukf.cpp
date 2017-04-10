@@ -9,7 +9,7 @@ using std::vector;
 /**
  * Initializes Unscented Kalman filter
  */
-UKF::UKF() {
+UKF::UKF(double std_radr, double std_radphi, double std_radrd) {
   // if this is false, laser measurements will be ignored (except during init)
   use_laser_ = true;
 
@@ -22,26 +22,26 @@ UKF::UKF() {
   // initial covariance matrix
   P_ = MatrixXd::Zero(5, 5);
 
-    // Process noise standard deviation longitudinal acceleration in m/s^2
+  // Process noise standard deviation longitudinal acceleration in m/s^2
     std_a_ =  30/100;
 
-    // Process noise standard deviation yaw acceleration in rad/s^2
+  // Process noise standard deviation yaw acceleration in rad/s^2
     std_yawdd_ = 30/100;
 
-    // Laser measurement noise standard deviation position1 in m
-    std_laspx_ = 0.025;
+  // Laser measurement noise standard deviation position1 in m
+    std_laspx_ = 0.009;
 
-    // Laser measurement noise standard deviation position2 in m
-    std_laspy_ = 0.025;
+  // Laser measurement noise standard deviation position2 in m
+    std_laspy_ = 0.009;
 
-    // Radar measurement noise standard deviation radius in m
-    std_radr_ = 0.15;
+  // Radar measurement noise standard deviation radius in m
+    std_radr_ = std_radr;// 0.091;
 
-    // Radar measurement noise standard deviation angle in rad
-    std_radphi_ = 0.02;
+  // Radar measurement noise standard deviation angle in rad
+    std_radphi_ = std_radphi;// 0.015;
 
-    // Radar measurement noise standard deviation radius change in m/s
-    std_radrd_ = .07;
+  // Radar measurement noise standard deviation radius change in m/s
+    std_radrd_ = std_radrd; //.07;
 
   /**
   TODO:
@@ -65,8 +65,8 @@ UKF::UKF() {
   Xsig_aug_ = MatrixXd::Zero(7,7*2+1);
 
   x_aug_ = VectorXd::Zero(n_x_ + 2);
-  S_laser = MatrixXd::Zero(nlaser_z, nlaser_z);
-  S_radar = MatrixXd::Zero(nradar_z, nradar_z);
+  S_laser = MatrixXd(nlaser_z, nlaser_z);
+  S_radar = MatrixXd(nradar_z, nradar_z);
 
 }
 
@@ -169,7 +169,7 @@ bool UKF::SigmaPointPrediction(void)
     double px_p, py_p;
 
     //avoid division by zero
-    if (fabs(yawd) > 0.01)
+    if (fabs(yawd) > 0.001)
     {
       px_p = p_x + v/yawd * ( sin (yaw + yawd*dt) - sin(yaw));
       py_p = p_y + v/yawd * ( cos(yaw) - cos(yaw+yawd*dt) );
@@ -263,14 +263,14 @@ inline VectorXd state2MeasVect(VectorXd state)
   phi = atan2(state[1] , state[0]);
   rho_dot = (state[0] * cos(state[3])*state[2] + \
                 state[1] * sin(state[3]) * state[2]);
-  if(fabs(rho) >= 0.0001f)
+  if(fabs(rho) >= 0.001f)
   {
     rho_dot /= rho;
   }
   else
   {
     std::cout << ".";
-    rho_dot /= 0.0001f;
+    rho_dot /= 0.001f;
   }
 
 
