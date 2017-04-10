@@ -36,7 +36,7 @@ Self-Driving Car Engineer Nanodegree Program
 ![](./nis_formula.png)
 
 
-## Resuls:
+## Results:
 
 ![](./references/results.png)
 
@@ -54,6 +54,7 @@ Self-Driving Car Engineer Nanodegree Program
 ### References:
 [https://www.seas.harvard.edu/courses/cs281/papers/unscented.pdf](https://www.seas.harvard.edu/courses/cs281/papers/unscented.pdf)
 
+ **Also See the references folder**
 
 
 
