@@ -1,0 +1,103 @@
+Data:1 [0.09, 0.09, 0.65, 0.65].
+Data:2  [0.20, 0.20, 0.55, 0.55].
+
+
+Accuracy - RMSE:
+0.175756
+0.154399
+ 5.40735
+ 5.22798
+
+  if(fabs(angle) <= 0.0001f)
+
+  Accuracy - RMSE:
+  0.138651
+  0.167346
+  2.76798
+  3.13079
+  Done!
+
+
+  // Process noise standard deviation longitudinal acceleration in m/s^2
+std_a_ =  30/10000;
+
+// Process noise standard deviation yaw acceleration in rad/s^2
+std_yawdd_ = 30/10000;
+
+// Laser measurement noise standard deviation position1 in m
+std_laspx_ = 0.15;
+
+// Laser measurement noise standard deviation position2 in m
+std_laspy_ = 0.15;
+
+// Radar measurement noise standard deviation radius in m
+std_radr_ = 0.15;
+
+// Radar measurement noise standard deviation angle in rad
+std_radphi_ = 0.02;
+
+// Radar measurement noise standard deviation radius change in m/s
+std_radrd_ = 10;
+Accuracy - RMSE:
+0.169047
+0.208833
+ 3.26974
+ 3.63914
+Done!
+
+
+// Process noise standard deviation longitudinal acceleration in m/s^2
+std_a_ =  30/10000000000;
+
+// Process noise standard deviation yaw acceleration in rad/s^2
+std_yawdd_ = 30/10000000;
+
+// Laser measurement noise standard deviation position1 in m
+std_laspx_ = 0.015;
+
+// Laser measurement noise standard deviation position2 in m
+std_laspy_ = 0.015;
+
+// Radar measurement noise standard deviation radius in m
+std_radr_ = 0.15;
+
+// Radar measurement noise standard deviation angle in rad
+std_radphi_ = 0.02;
+
+// Radar measurement noise standard deviation radius change in m/s
+std_radrd_ = 10;
+Accuracy - RMSE:
+0.434382
+0.555611
+ 1.82298
+  2.2271
+Done!
+
+
+
+// Process noise standard deviation longitudinal acceleration in m/s^2
+std_a_ =  30/10000000000;
+
+// Process noise standard deviation yaw acceleration in rad/s^2
+std_yawdd_ = 30/10000000;
+
+// Laser measurement noise standard deviation position1 in m
+std_laspx_ = 0.015;
+
+// Laser measurement noise standard deviation position2 in m
+std_laspy_ = 0.015;
+
+// Radar measurement noise standard deviation radius in m
+std_radr_ = 0.15;
+
+// Radar measurement noise standard deviation angle in rad
+std_radphi_ = 0.02;
+
+// Radar measurement noise standard deviation radius change in m/s
+std_radrd_ = .07;
+Accuracy - RMSE:
+0.0663323
+0.0872579
+  2.22739
+  2.51687
+Done!

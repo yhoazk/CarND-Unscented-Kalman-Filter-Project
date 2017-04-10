@@ -13,11 +13,17 @@ using namespace std;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 using std::vector;
-
+float radr;
+float radphi;
+float radrd;
 void check_arguments(int argc, char* argv[]) {
   string usage_instructions = "Usage instructions: ";
   usage_instructions += argv[0];
   usage_instructions += " path/to/input.txt output.txt";
+
+  sscanf(argv[2], "%f", &radr);
+  sscanf(argv[3], "%f", &radphi);
+  sscanf(argv[4], "%f", &radrd);
 
   bool has_valid_args = false;
 
@@ -26,11 +32,12 @@ void check_arguments(int argc, char* argv[]) {
     cerr << usage_instructions << endl;
   } else if (argc == 2) {
     cerr << "Please include an output file.\n" << usage_instructions << endl;
-  } else if (argc == 3) {
+  } else if (argc == 6) {
     has_valid_args = true;
-  } else if (argc > 3) {
+  } else if (argc > 6) {
     cerr << "Too many arguments.\n" << usage_instructions << endl;
   }
+
 
   if (!has_valid_args) {
     exit(EXIT_FAILURE);
@@ -130,7 +137,7 @@ int main(int argc, char* argv[]) {
   }
 
   // Create a UKF instance
-  UKF ukf(0.091, 0.015, 0.07);
+  UKF ukf(radr, radphi, radrd);
 
   // used to compute the RMSE later
   vector<VectorXd> estimations;
