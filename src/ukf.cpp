@@ -321,7 +321,7 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
       }
       x_ << px,py,meas_package.raw_measurements_[2],meas_package.raw_measurements_[1],0;
     }
-
+    cout << "X:" << x_;
     previous_timestamp_ = meas_package.timestamp_;
     is_initialized_ = true;
     return;
@@ -341,6 +341,8 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
     UpdateRadar(meas_package);
   }
   previous_timestamp_ = meas_package.timestamp_;
+  cout << "X:" << x_;
+  cout << "----" << endl;
 }
 
 /**
