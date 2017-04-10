@@ -35,13 +35,13 @@ UKF::UKF() {
     std_laspy_ = 0.025;
 
     // Radar measurement noise standard deviation radius in m
-    std_radr_ = 0.5;
+    std_radr_ = 0.15;
 
     // Radar measurement noise standard deviation angle in rad
-    std_radphi_ = 0.026;
+    std_radphi_ = 0.02;
 
     // Radar measurement noise standard deviation radius change in m/s
-    std_radrd_ = .14;
+    std_radrd_ = .07;
 
   /**
   TODO:
@@ -65,8 +65,8 @@ UKF::UKF() {
   Xsig_aug_ = MatrixXd::Zero(7,7*2+1);
 
   x_aug_ = VectorXd::Zero(n_x_ + 2);
-  S_laser = MatrixXd(nlaser_z, nlaser_z);
-  S_radar = MatrixXd(nradar_z, nradar_z);
+  S_laser = MatrixXd::Zero(nlaser_z, nlaser_z);
+  S_radar = MatrixXd::Zero(nradar_z, nradar_z);
 
 }
 
@@ -306,20 +306,32 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
     }
     if(meas_package.sensor_type_ == MeasurementPackage::LASER)
     {
-      x_ <<  meas_package.raw_measurements_[0],  meas_package.raw_measurements_[1], \
+      if(fabs(meas_package.raw_measurements_[0]) >= 0.001f || \
+          fabs(meas_package.raw_measurements_[0]) >= 0.001f ){
+        x_ <<  meas_package.raw_measurements_[0],  meas_package.raw_measurements_[1], \
             0.0f, 0.0f;
+      } else{
+        x_ << 0.001, 0.001,0,0;
+      }
+
       std::cout << x_ << std::endl;
     } else /* Measurement is radar */
     {
       //x_.fill(0.0f);
+      if(fabs(meas_package.raw_measurements_[0]) >= 0.001f && \
+          fabs(meas_package.raw_measurements_[1]) >= 0.001f && \
+          fabs(meas_package.raw_measurements_[2]) >= 0.001f
+          ) {
 
-      double_t px= meas_package.raw_measurements_[0] * cos(meas_package.raw_measurements_[1]);
-      double_t py = meas_package.raw_measurements_[0] * sin(meas_package.raw_measurements_[1]);
-      if(fabs(px) <= 0.001f || fabs(py) <= 0.001f)
-      {
-        return;
+        double_t px = meas_package.raw_measurements_[0] * cos(meas_package.raw_measurements_[1]);
+        double_t py = meas_package.raw_measurements_[0] * sin(meas_package.raw_measurements_[1]);
+        if (fabs(px) <= 0.001f || fabs(py) <= 0.001f) {
+          return;
+        }
+        x_ << px,py,meas_package.raw_measurements_[2],meas_package.raw_measurements_[1],0;
+
       }
-      x_ << px,py,meas_package.raw_measurements_[2],meas_package.raw_measurements_[1],0;
+      x_ << 0.001f, 0.001f, 0.00f,0,0;
     }
     cout << "X:" << x_;
     previous_timestamp_ = meas_package.timestamp_;
@@ -342,7 +354,7 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
   }
   previous_timestamp_ = meas_package.timestamp_;
   cout << "X:" << x_;
-  cout << "----" << endl;
+  cout << "\n----" << endl;
 }
 
 /**
