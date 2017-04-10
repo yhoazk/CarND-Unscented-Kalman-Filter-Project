@@ -21,9 +21,9 @@ void check_arguments(int argc, char* argv[]) {
   usage_instructions += argv[0];
   usage_instructions += " path/to/input.txt output.txt";
 
-  sscanf(argv[2], "%f", &radr);
-  sscanf(argv[3], "%f", &radphi);
-  sscanf(argv[4], "%f", &radrd);
+  //sscanf(argv[2], "%f", &radr);
+  //sscanf(argv[3], "%f", &radphi);
+  //sscanf(argv[4], "%f", &radrd);
 
   bool has_valid_args = false;
 
@@ -64,7 +64,7 @@ int main(int argc, char* argv[]) {
   string in_file_name_ = argv[1];
   ifstream in_file_(in_file_name_.c_str(), ifstream::in);
 
-  string out_file_name_ = argv[2];
+  string out_file_name_ = argv[5];
   ofstream out_file_(out_file_name_.c_str(), ofstream::out);
 
   check_files(in_file_, in_file_name_, out_file_, out_file_name_);

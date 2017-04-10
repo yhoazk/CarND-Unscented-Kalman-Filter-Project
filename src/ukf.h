@@ -19,7 +19,7 @@ class UKF {
   //bool AugmentedSigmaPoints(MatrixXd* Xsig_out);
   bool AugmentedSigmaPoints(void);
  // bool SigmaPointPrediction(MatrixXd* Xsig_out);
-  bool SigmaPointPrediction(void);
+  bool SigmaPointPrediction(double_t);
  // bool PredictMeanAndCovariance(VectorXd* x_out, MatrixXd* P_out);
   bool PredictMeanAndCovariance(void);
  // bool PredictRadarMeasurement(VectorXd* z_out, MatrixXd* S_out);
