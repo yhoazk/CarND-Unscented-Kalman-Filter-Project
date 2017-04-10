@@ -52,18 +52,16 @@ UKF::UKF(double std_radr, double std_radphi, double std_radrd) {
   */
   n_x_ = 5; // 5 state dimensions
   n_aug_ = n_x_ +2; // Augmented noise states
-  Xsig_pred_ = MatrixXd::Zero(n_x_,2*n_aug_ + 1); // TODO: Dimensions
+  Xsig_pred_ = MatrixXd::Zero(n_x_,2*n_aug_ + 1);
   nradar_z = 3;
   nlaser_z = 2;
   P_aug_ = MatrixXd::Zero(n_aug_, n_aug_);
   lambda_ = 3 - n_x_;
   weights_ = VectorXd::Zero(2*n_aug_+1);
   /* Covariance matrix */
-  // TODO: Inital values?
+  // TODO: How to choose initial values?
   P_ = MatrixXd::Identity(n_x_, n_x_);
-
   Xsig_aug_ = MatrixXd::Zero(7,7*2+1);
-
   x_aug_ = VectorXd::Zero(n_x_ + 2);
   S_laser = MatrixXd(nlaser_z, nlaser_z);
   S_radar = MatrixXd(nradar_z, nradar_z);
@@ -303,10 +301,6 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
       }
     } else /* Measurement is radar */
     {
-     /* if(fabs(meas_package.raw_measurements_[0])  <= 0.001f || \
-          fabs(meas_package.raw_measurements_[1]) <= 0.001f || \
-          fabs(meas_package.raw_measurements_[2]) <= 0.001f
-          ) {*/
 
         double_t px = meas_package.raw_measurements_[0] * cos(meas_package.raw_measurements_[1]);
         double_t py = meas_package.raw_measurements_[0] * sin(meas_package.raw_measurements_[1]);
@@ -315,17 +309,17 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
           return;
         }
         x_ << px,py,meas_package.raw_measurements_[2],meas_package.raw_measurements_[1],0;
-
-      //}
-      /*  x_ << 0.001f, 0.001f, 0.00f,0,0;*/
     }
-   // cout << "X:" << x_;
     previous_timestamp_ = meas_package.timestamp_;
     is_initialized_ = true;
     return;
   }
 
   dt = (meas_package.timestamp_ - previous_timestamp_)/ (double_t)1000000.0;
+  /**
+   * NOTE: This repetitive step is necessary if the measurements arrive
+   * at a freq <10Hz. 
+   */
   while (dt > 0.1)
   {
     //cout << "xxxxxxxxxxxxx" << dt << endl;
@@ -382,14 +376,11 @@ void UKF::Prediction(double delta_t) {
  */
 void UKF::UpdateLidar(MeasurementPackage meas_package) {
   /**
-  TODO:
-
   Complete this function! Use lidar data to update the belief about the object's
   position. Modify the state vector, x_, and covariance, P_.
 
   You'll also need to calculate the lidar NIS.
   */
-  //
   MatrixXd Tc = MatrixXd::Zero(n_x_, nlaser_z);
   MatrixXd R  = MatrixXd::Zero(nlaser_z, nlaser_z);
   MatrixXd Zsig = MatrixXd::Zero(nlaser_z, 2*n_aug_+1);
@@ -507,10 +498,6 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
     VectorXd x_diff = Xsig_pred_.col(i) - x_;
     VectorXd z_diff = Zsig.col(i) - z_pred;
     z_diff(1) = wrapAngle(z_diff(1));
-    //while (z_diff(1)> M_PI) z_diff(1)-=2.*M_PI;
-    //while (z_diff(1)<-M_PI) z_diff(1)+=2.*M_PI;
-    //while (x_diff(3)> M_PI) x_diff(3)-=2.*M_PI;
-    //while (x_diff(3)<-M_PI) x_diff(3)+=2.*M_PI;
     x_diff(3)= wrapAngle(x_diff(3));
     Tc = Tc + weights_(i) * x_diff * z_diff.transpose();
   }
@@ -518,7 +505,6 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
   Si = S_radar.inverse();
   MatrixXd Kg = Tc * Si;
   VectorXd z_diff_g = meas_package.raw_measurements_ - z_pred;
-  //while (z_diff_g(1)> M_PI) z_diff_g(1)-=2.*M_PI;
   z_diff_g(1)= wrapAngle(z_diff_g(1));
   //update state mean and covariance matrix
   x_ = x_ + Kg*(z_diff_g);
