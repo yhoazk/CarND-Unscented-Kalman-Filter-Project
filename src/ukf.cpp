@@ -175,7 +175,6 @@ bool UKF::AugmentedSigmaPoints(void)
     throw std::runtime_error("Possibly non semi-positive definitie matrix!");
   }
 
-
   //create augmented sigma points
   Xsig_aug_.col(0)  = x_aug;
   double_t sqrt_lambda_n_aug = sqrt(lambda_+n_aug_);
@@ -322,7 +321,7 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
   while (dt > 0.1)
   {
     dt -= 0.1;
-    Prediction(0.1); // Predict to get a better RMSE if the time between meas. is >10Hz
+    Prediction(0.1); // Predict to get a better RMSE if the time between meas. is >1/10Hz
   }
   Prediction(dt);
 
@@ -334,9 +333,6 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
     }
   } else if(use_radar_) /* Is radar */
   {
-    if (fabs(meas_package.raw_measurements_[2]) <= 0.001f){
-      meas_package.raw_measurements_[2] = 0.001f;
-    }
     UpdateRadar(meas_package);
   }
   previous_timestamp_ = meas_package.timestamp_;
@@ -379,7 +375,6 @@ void UKF::UpdateLidar(MeasurementPackage meas_package) {
   }
   S_laser.fill(0.0f);
   for (int k = 0; k < n_sigma_; ++k) {
-    //VectorXd x_diff = Xsig_pred_.col(i) - x_;
     VectorXd z_diff = Zsig.col(k) - z_pred;
     S_laser += weights_(k) * z_diff * z_diff.transpose();
   }
@@ -409,14 +404,6 @@ void UKF::UpdateLidar(MeasurementPackage meas_package) {
  * @param {MeasurementPackage} meas_package
  */
 void UKF::UpdateRadar(MeasurementPackage meas_package) {
-  /**
-  TODO:
-
-  Complete this function! Use radar data to update the belief about the object's
-  position. Modify the state vector, x_, and covariance, P_.
-
-  You'll also need to calculate the radar NIS.
-  */
   MatrixXd Si;
   MatrixXd Tc = MatrixXd::Zero(n_x_, nradar_z);
   MatrixXd Zsig = MatrixXd::Zero(nradar_z, n_sigma_);
@@ -450,14 +437,12 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
     Zsig(1,j) = phi;
     Zsig(2,j) = rho_dot;
   }
-  //z_pred.fill(0.0f);
   for (int k = 0; k < n_sigma_; k++)
   {
     z_pred += weights_(k) * Zsig.col(k);
   }
   S_radar.fill(0);
   for (size_t i = 0; i < n_sigma_; i++) {
-    //VectorXd x_diff = Xsig_pred_.col(i) - x_;
     VectorXd z_diff = Zsig.col(i) - z_pred;
     z_diff(1) = wrapAngle(z_diff(1));
 
