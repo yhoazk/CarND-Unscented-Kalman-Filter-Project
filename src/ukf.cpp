@@ -117,7 +117,14 @@ bool UKF::GenerateSigmaPoints(void)
 {
   bool status = true;
   //calculate square root of P
-  MatrixXd A = P_.llt().matrixL();
+  Eigen::LLT<Eigen::MatrixXd> lltOfA(P_);
+  MatrixXd A = lltOfA.matrixL();
+  if(lltOfA.info() == Eigen::NumericalIssue)
+  {
+    throw std::runtime_error("Possibly non semi-positive definitie matrix!");
+  }
+
+
   Xsig_pred_.col(0) << x_;
   double sq_lambda = sqrt(lambda_+n_x_);
   for(int j=1; j<n_x_+1; ++j)
@@ -160,7 +167,14 @@ bool UKF::AugmentedSigmaPoints(void)
   p_aug(6,6) = std_yawdd_ * std_yawdd_;
 
   //create square root matrix
-  MatrixXd L = p_aug.llt().matrixL();
+
+  Eigen::LLT<Eigen::MatrixXd> lltOfA(p_aug);
+  MatrixXd L = lltOfA.matrixL();
+  if(lltOfA.info() == Eigen::NumericalIssue)
+  {
+    throw std::runtime_error("Possibly non semi-positive definitie matrix!");
+  }
+
 
   //create augmented sigma points
   Xsig_aug_.col(0)  = x_aug;
