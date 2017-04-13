@@ -112,7 +112,7 @@ public:
   /**
    * Constructor
    */
-  UKF(double_t, double_t, double_t);
+  UKF(float, float);
 
   /**
    * Destructor

@@ -9,7 +9,7 @@ using std::vector;
 /**
  * Initializes Unscented Kalman filter
  */
-UKF::UKF(double std_radr, double std_radphi, double std_radrd) {
+UKF::UKF(float std_a, float std_yawdd) {
   // if this is false, laser measurements will be ignored (except during init)
   use_laser_ = true;
 
@@ -23,10 +23,24 @@ UKF::UKF(double std_radr, double std_radphi, double std_radrd) {
   P_ = MatrixXd::Zero(5, 5);
 
   // Process noise standard deviation longitudinal acceleration in m/s^2
-    std_a_ = 0.92105263; //std_radr; //3/100;
+  if(-1.0f != std_a) // No negative covarianes here
+  {
+    std_a_ = (double)std_a;
+  }
+  else
+  {
+    std_a_ = 0.92105263;
+  }
 
   // Process noise standard deviation yaw acceleration in rad/s^2
-    std_yawdd_ = 1.71052632; //std_radphi;//0.3;//3/100;
+  if(-1.0f != std_yawdd)
+  {
+    std_yawdd_ = (double_t) std_yawdd;
+  }
+  else
+  {
+    std_yawdd_ = 1.71052632;
+  }
 
   // Laser measurement noise standard deviation position1 in m
     std_laspx_ = 0.15;
@@ -38,10 +52,10 @@ UKF::UKF(double std_radr, double std_radphi, double std_radrd) {
     std_radr_ = 0.3; // 0.091;
 
   // Radar measurement noise standard deviation angle in rad
-    std_radphi_ = 0.03;//std_radphi;// 0.015;
+    std_radphi_ = 0.03;
 
   // Radar measurement noise standard deviation radius change in m/s
-    std_radrd_ = .3;
+    std_radrd_ = 0.3;
 
   n_x_ = 5; // 5 state dimensions
   n_aug_ = n_x_ +2; // Augmented noise states
@@ -69,7 +83,7 @@ UKF::UKF(double std_radr, double std_radphi, double std_radrd) {
 
 inline double wrapAngle( double angle )
 {
-  #if 0
+  #if 0 // NOTE: this implementation gives a higher RMSE
   if(fabs(angle) <= 0.001f)
   {
     return 0.001;//angle;
@@ -209,8 +223,6 @@ bool UKF::SigmaPointPrediction(double delta_t)
     Xsig_pred_(3,i) = yaw_p;
     Xsig_pred_(4,i) = yawd_p;
   }
-  //std::cout << Xsig_pred_ << std::endl;
-  //std::cout << Xsig_aug_ << std::endl;
   return (status);
 }
 /**
@@ -233,13 +245,6 @@ bool UKF::PredictMeanAndCovariance(void)
     //angle normalization
     // set the angle between +Pi and -Pi
     x_diff(3) = wrapAngle(x_diff(3));
-    //while (x_diff(3)> M_PI) x_diff(3)-=2.*M_PI;
-    //while (x_diff(3)<-M_PI) x_diff(3)+=2.*M_PI;
-   // std::cout <<  "x_diff[3]:  ";
-   // std::cout << x_diff[3] << "  dt: " << dt << std::endl;
-
-
-
     tmp_P = tmp_P + weights_(i)*x_diff*x_diff.transpose();
   }
   x_ = tmp_x;
@@ -301,19 +306,10 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
    */
   while (dt > 0.1)
   {
-    //cout << "xxxxxxxxxxxxx" << dt << endl;
     dt -= 0.1;
-    Prediction(0.1); // Kalman Filter prediction step
+    Prediction(0.1); // Predict to get a better RMSE if the time between meas. is >10Hz
   }
   Prediction(dt);
-
-  if (fabs(meas_package.raw_measurements_[0]) <= 0.001f){
-    meas_package.raw_measurements_[0] = 0.001f;
-  }
-  if (fabs(meas_package.raw_measurements_[1]) <= 0.001f){
-    meas_package.raw_measurements_[1] = 0.001f;
-  }
-
 
   if(meas_package.sensor_type_ == MeasurementPackage::LASER)
   {
@@ -338,10 +334,6 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
  */
 void UKF::Prediction(double delta_t) {
   /**
-  TODO:
-
-  Complete this function! Estimate the object's location. Modify the state
-  vector, x_. Predict sigma points, the state, and the state covariance matrix.
   */
   AugmentedSigmaPoints();
   SigmaPointPrediction(delta_t);
@@ -354,10 +346,6 @@ void UKF::Prediction(double delta_t) {
  */
 void UKF::UpdateLidar(MeasurementPackage meas_package) {
   /**
-  Complete this function! Use lidar data to update the belief about the object's
-  position. Modify the state vector, x_, and covariance, P_.
-
-  You'll also need to calculate the lidar NIS.
   */
   MatrixXd Tc = MatrixXd::Zero(n_x_, nlaser_z);
   MatrixXd Zsig = MatrixXd::Zero(nlaser_z, 2*n_aug_+1);
@@ -457,8 +445,6 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
     //VectorXd x_diff = Xsig_pred_.col(i) - x_;
     VectorXd z_diff = Zsig.col(i) - z_pred;
     z_diff(1) = wrapAngle(z_diff(1));
-    //while (z_diff(1)> M_PI) z_diff(1)-=2.*M_PI;
-    //while (z_diff(1)<-M_PI) z_diff(1)+=2.*M_PI;
 
     S_radar += weights_(i) * z_diff * z_diff.transpose();
   }

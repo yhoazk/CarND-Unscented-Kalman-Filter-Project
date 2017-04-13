@@ -13,17 +13,21 @@ using namespace std;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 using std::vector;
-float radr;
-float radphi;
-float radrd;
+
+float radr = -1.0f;
+float radphi = -1.0f;
+float radrd = -1.0f;
 void check_arguments(int argc, char* argv[]) {
   string usage_instructions = "Usage instructions: ";
   usage_instructions += argv[0];
   usage_instructions += " path/to/input.txt output.txt";
 
-  sscanf(argv[2], "%f", &radr);
-  sscanf(argv[3], "%f", &radphi);
-  sscanf(argv[4], "%f", &radrd);
+  if(argc > 3)
+  {
+    sscanf(argv[3], "%f", &radr);
+    sscanf(argv[4], "%f", &radphi);
+    sscanf(argv[5], "%f", &radrd);
+  }
 
   bool has_valid_args = false;
 
@@ -32,7 +36,7 @@ void check_arguments(int argc, char* argv[]) {
     cerr << usage_instructions << endl;
   } else if (argc == 2) {
     cerr << "Please include an output file.\n" << usage_instructions << endl;
-  } else if (argc == 6) {
+  } else if (argc == 3 || argc == 6){
     has_valid_args = true;
   } else if (argc > 6) {
     cerr << "Too many arguments.\n" << usage_instructions << endl;
@@ -64,7 +68,7 @@ int main(int argc, char* argv[]) {
   string in_file_name_ = argv[1];
   ifstream in_file_(in_file_name_.c_str(), ifstream::in);
 
-  string out_file_name_ = argv[5];
+  string out_file_name_ = argv[2];
   ofstream out_file_(out_file_name_.c_str(), ofstream::out);
 
   check_files(in_file_, in_file_name_, out_file_, out_file_name_);
@@ -137,7 +141,7 @@ int main(int argc, char* argv[]) {
   }
 
   // Create a UKF instance
-  UKF ukf(radr, radphi, radrd);
+  UKF ukf(radr, radphi);
 
   // used to compute the RMSE later
   vector<VectorXd> estimations;

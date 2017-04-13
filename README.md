@@ -18,6 +18,11 @@ Self-Driving Car Engineer Nanodegree Program
    some sample inputs in 'data/'.
     - eg. `./UnscentedKF ../data/sample-laser-radar-measurement-data-1.txt output.txt`
 
+   In order to experiment with other values of `std_a` and `std_yawdd` add inputs
+   vaues to the command line.
+   - eg. `./UnscentedKF ../data/sample-laser-radar-measurement-data-1.txt output.txt 0.01 1.01`
+
+
 
 #### Formulas:
 ##### L14: Generate Sigma Points
@@ -42,11 +47,16 @@ Self-Driving Car Engineer Nanodegree Program
 
 ### Plot dataset #1
 ![](./references/plot_data1.png)
+### NIS for Dataset #1
+![](./references/NIS_data1.png)
+
 
 ### Plot dataset #2
 ![](./references/plot_data2.png)
 ### Plot dataset zoom #2
 ![](./references/figure_2_zoom.png)
+### NIS for Dataset #2
+![](./references/NIS_data2.png)
 
 
 
