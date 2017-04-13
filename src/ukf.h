@@ -106,7 +106,8 @@ public:
   ///* the current NIS for laser
   double NIS_laser_;
 
-
+  ///* Sigma n
+  int n_sigma_;
   MatrixXd R_laser;
   MatrixXd R_radar;
   /**
