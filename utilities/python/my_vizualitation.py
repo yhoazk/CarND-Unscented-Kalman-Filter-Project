@@ -42,6 +42,8 @@ plt.show()
 
 
 plt.plot(values['NIS'])
+plt.axhline(7.8, linewidth=4, color='r')
+
 plt.show()
 
 '''

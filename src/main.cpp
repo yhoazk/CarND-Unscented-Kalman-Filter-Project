@@ -21,9 +21,9 @@ void check_arguments(int argc, char* argv[]) {
   usage_instructions += argv[0];
   usage_instructions += " path/to/input.txt output.txt";
 
-  //sscanf(argv[2], "%f", &radr);
-  //sscanf(argv[3], "%f", &radphi);
-  //sscanf(argv[4], "%f", &radrd);
+  sscanf(argv[2], "%f", &radr);
+  sscanf(argv[3], "%f", &radphi);
+  sscanf(argv[4], "%f", &radrd);
 
   bool has_valid_args = false;
 
@@ -200,7 +200,7 @@ int main(int argc, char* argv[]) {
     // output the NIS values
     
     if (measurement_pack_list[k].sensor_type_ == MeasurementPackage::LASER) {
-      out_file_ << ukf.NIS_laser_ << "\n";
+      out_file_ << 0.0/*ukf.NIS_laser_*/ << "\n";
     } else if (measurement_pack_list[k].sensor_type_ == MeasurementPackage::RADAR) {
       out_file_ << ukf.NIS_radar_ << "\n";
     }
